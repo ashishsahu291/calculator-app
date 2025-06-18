@@ -1,8 +1,8 @@
-import { useMemo, useReducer } from "react";
+import React, { useMemo, useReducer } from "react";
 import "./App.css";
 import DigitButton from "./components/DigitButton";
 import OperationButton from "./components/OperationButton";
-import { ACTIONS } from "./utility/constants";
+import { ACTIONS, BUTTON_LAYOUT } from "./utility/constants";
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -157,32 +157,39 @@ function App() {
         </div>
         <div className="current-operand">{formatedCurrent}</div>
       </div>
-      <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
-      <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
-        DEL
-      </button>
-      <OperationButton dispatch={dispatch} operation="%" />
-      <OperationButton dispatch={dispatch} operation="/" />
-      <DigitButton dispatch={dispatch} digit="1" />
-      <DigitButton dispatch={dispatch} digit="2" />
-      <DigitButton dispatch={dispatch} digit="3" />
-      <OperationButton dispatch={dispatch} operation="*" />
-      <DigitButton dispatch={dispatch} digit="4" />
-      <DigitButton dispatch={dispatch} digit="5" />
-      <DigitButton dispatch={dispatch} digit="6" />
-      <OperationButton dispatch={dispatch} operation="+" />
-      <DigitButton dispatch={dispatch} digit="7" />
-      <DigitButton dispatch={dispatch} digit="8" />
-      <DigitButton dispatch={dispatch} digit="9" />
-      <OperationButton dispatch={dispatch} operation="-" />
-      <DigitButton dispatch={dispatch} digit="." />
-      <DigitButton dispatch={dispatch} digit="0" />
-      <button
-        className="span-two"
-        onClick={() => dispatch({ type: ACTIONS.EVALUATE })}
-      >
-        =
-      </button>
+      {BUTTON_LAYOUT.map((row, rowIndex) => (
+        <React.Fragment key={rowIndex}>
+          {row.map((btn, index) => {
+            if (btn.digit != null) {
+              return (
+                <DigitButton
+                  dispatch={dispatch}
+                  digit={btn.digit}
+                  key={index}
+                />
+              );
+            }
+            if (btn.operation != null) {
+              return (
+                <OperationButton
+                  dispatch={dispatch}
+                  operation={btn.operation}
+                  key={index}
+                />
+              );
+            }
+            return (
+              <button
+                className={btn.span ? "span-two" : ""}
+                onClick={() => dispatch({ type: btn.type })}
+                key={index}
+              >
+                {btn.label}
+              </button>
+            );
+          })}
+        </React.Fragment>
+      ))}
     </div>
   );
 }
