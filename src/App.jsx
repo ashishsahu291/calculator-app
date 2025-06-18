@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useMemo, useReducer } from "react";
 import "./App.css";
 import DigitButton from "./components/DigitButton";
 import OperationButton from "./components/OperationButton";
@@ -7,11 +7,9 @@ import { ACTIONS } from "./utility/constants";
 function reducer(state, { type, payload }) {
   switch (type) {
     case ACTIONS.ADD_DIGIT:
-      addDigit(state, payload);
-      break;
+      return addDigit(state, payload);
     case ACTIONS.CHOOSE_OPERATION:
-      chooseOperation(state, payload);
-      break;
+      return chooseOperation(state, payload);
     case ACTIONS.CLEAR:
       return {};
     case ACTIONS.EVALUATE:
@@ -31,8 +29,9 @@ function reducer(state, { type, payload }) {
         currentOperand: evaluate(state),
       };
     case ACTIONS.DELETE_DIGIT:
-      deleteDigit(state);
-      break;
+      return deleteDigit(state);
+    default:
+      return state;
   }
 }
 
@@ -140,14 +139,23 @@ function App() {
     reducer,
     {}
   );
+  const formatedPrevious = useMemo(
+    () => formatOperand(previousOperand),
+    [previousOperand]
+  );
+  const formatedCurrent = useMemo(
+    () => formatOperand(currentOperand),
+    [currentOperand]
+  );
+
   return (
     <div className="calculator-grid">
       <div className="output">
         <div className="previous-operand">
-          {formatOperand(previousOperand)}
+          {formatedPrevious}
           {operation}
         </div>
-        <div className="current-operand">{formatOperand(currentOperand)}</div>
+        <div className="current-operand">{formatedCurrent}</div>
       </div>
       <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
       <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
